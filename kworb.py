@@ -34,13 +34,22 @@ for i in range(delta.days + 1):
     # Produz arquivo .csv
     with open("arquivos/" + data + ".out.csv", "w") as f:
         wr = csv.writer(f)
-        wr.writerow(headers)
+        wr.writerow(headers[0:3])
         i = 1
         while i < len(table_data):
-            splited = table_data[i][1].split('-')   
+            splited = table_data[i][1].split(' - ')   
             table_data[i][3:len(row)+1] = table_data[i][2:-1]
             table_data[i][1] = splited[0]
             table_data[i][2] = splited[1]
-            wr.writerow(table_data[i])
+            wr.writerow(table_data[i][0:3])
             i += 1
+        f.close()
+            
+    with open("arquivos/" + data + ".out.csv", "r") as f:
+        reader = csv.DictReader(f)
+        rows = list(reader)
+        f.close()
+
+    with open("arquivos/" + data + ".out.json", "w") as f:
+        json.dump(rows, f)
         f.close()
