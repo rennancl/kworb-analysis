@@ -24,7 +24,6 @@ for i in range(delta.days + 1):
     table = soup.select_one("table.sortable")
     table_data = [[cell.text.encode(soup.original_encoding) for cell in row("td")]
         for row in table("tr")]
-    print json.dumps(dict(table_data))
     headers = [th.text.encode(soup.original_encoding) for th in table.select("tr th")]
     
     # Produz arquivo .csv
