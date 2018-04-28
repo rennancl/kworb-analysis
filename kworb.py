@@ -2,6 +2,7 @@ from datetime import date, timedelta
 from bs4 import BeautifulSoup
 import urllib2
 import csv
+import json
 
 url = "http://kworb.net/pop/archive/"
 d1 = date(2013, 8, 13)  # start date
@@ -22,16 +23,21 @@ for i in range(delta.days + 1):
     soup = BeautifulSoup(page, "html.parser")
     table = soup.select_one("table.sortable")
 
-    # #Arquivo de teste
-    # test = open("tabela.txt","w")
-    # test.write(table)
-    # test.close()
-
-    headers = [th.text.encode("utf-8") for th in table.select("tr th")]
+    table_data = [[cell.text.encode(soup.original_encoding) for cell in row("td")]
+        for row in table("tr")]
+    print json.dumps(dict(table_data))
+    headers = [th.text.encode(soup.original_encoding) for th in table.select("tr th")]
     
-    #Produz arquivo .csv
+    # Produz arquivo .csv
     with open("arquivos/" + data + ".out.csv", "w") as f:
         wr = csv.writer(f)
         wr.writerow(headers)
-        wr.writerows([[td.text.encode("utf-8") for td in row.find_all("td")] for row in table.select("tr + tr")])
+        wr.writerows(table_data)
         f.close()
+
+#TESTES 
+
+    # #Arquivo de teste
+    # test = open("tabela.txt","w")
+    # test.write(table.prettify().encode(soup.original_encoding))
+    # test.close()
