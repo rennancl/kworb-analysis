@@ -22,7 +22,6 @@ for i in range(delta.days + 1):
     #Parsing da pagina
     soup = BeautifulSoup(page, "html.parser")
     table = soup.select_one("table.sortable")
-
     table_data = [[cell.text.encode(soup.original_encoding) for cell in row("td")]
         for row in table("tr")]
     print json.dumps(dict(table_data))
@@ -34,10 +33,3 @@ for i in range(delta.days + 1):
         wr.writerow(headers)
         wr.writerows(table_data)
         f.close()
-
-#TESTES 
-
-    # #Arquivo de teste
-    # test = open("tabela.txt","w")
-    # test.write(table.prettify().encode(soup.original_encoding))
-    # test.close()
