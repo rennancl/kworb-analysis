@@ -6,7 +6,7 @@ import json
 
 url = "http://kworb.net/pop/archive/"
 d1 = date(2013, 8, 13)  # start date
-d2 = date(2013, 8, 14)  # end date
+d2 = date(2018, 5, 6)  # end date
 delta = d2 - d1         # timedelta
 fj = open("arquivos/final/history.out.json", "w")
 fh = open("arquivos/final/history.out.csv", "w")
@@ -19,7 +19,10 @@ for i in range(delta.days + 1):
     data = date.strftime('%Y%m%d')
    
    	#Busca e baixa pagina
-    response = urllib2.urlopen('' + url + data + '.html')
+    try:
+        response = urllib2.urlopen('' + url + data + '.html')
+    except urllib2.HTTPError, e:
+        continue
     page = response.read()
 
     #Parsing da pagina
@@ -47,7 +50,11 @@ for i in range(delta.days + 1):
             splited = table_data[i][1].split(' - ')   
             table_data[i][6:len(row)+4] = table_data[i][2:-1]
             table_data[i][1] = splited[0]
-            table_data[i][2] = splited[1]
+            if(1 <= len(splited)-1): 
+                table_data[i][2] = splited[1] 
+            else:
+                table_data[i][2] = " "
+                print splited
             table_data[i][3] = date.day
             table_data[i][4] = date.month
             table_data[i][5] = date.year            

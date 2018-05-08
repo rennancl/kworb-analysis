@@ -8,16 +8,10 @@ def f(x):
 	return x
 
 
-#Plota todas as vezes que os artista aparecem, seja sozinhos, ou em feats (antes os feats era considerados um artista apenas)
+#Todas os artisas presentes (e em ordem)
 artists = archiveRDD.flatMap(lambda x: x[0].split(","))
+artists = artists.map(lambda x: x.lower())
 artists_frequence = artists.map(lambda x: (x,1)).reduceByKey(lambda x,y:x+y).map(lambda x: (x[1],x[0])).sortByKey(ascending=False)
-
-
-#Plota todas as relações musica-artista e aparecem mais de uma vez, caso seja uma música frequente
-artist_music = archiveRDD.map(lambda x: (x[0].split(",")[0],x[2].split(" (")[0]))
-
-#Plota todas as relações musica-posicao e aparecem mais de uma vez, caso seja uma música frequente
-music_pos = archiveRDD.map(lambda x: (x[2].split(" (")[0], x[1]))
 
 #Todas as musica:
 musics = archiveRDD.map(lambda x: x[2].split(" (")[0].lower())
@@ -26,4 +20,30 @@ frequence_musics = musics.map(lambda x: (x,1)).reduceByKey(lambda x,y:x+y).map(l
 #Todas as palavras presentes em todas as músicas
 music_words = musics.flatMap(lambda x: x.split())
 frequence_words = music_words.map(lambda x: (x,1)).reduceByKey(lambda x,y:x+y).map(lambda x: (x[1],x[0])).sortByKey(ascending=False)
-frequence_words5 = frequence_words.filter(lambda x: len(x[0])>=2)
+
+#Todas as palavras com ou mais de 5/10 letras presentes em todas as músicas
+music_words5 = music_words.filter(lambda x: len(x)>=5)
+frequence_words5 = music_words5.map(lambda x: (x,1)).reduceByKey(lambda x,y:x+y).map(lambda x: (x[1],x[0])).sortByKey(ascending=False)
+
+music_words10 = music_words.filter(lambda x: len(x)>=10)
+frequence_words10 = music_words10.map(lambda x: (x,1)).reduceByKey(lambda x,y:x+y).map(lambda x: (x[1],x[0])).sortByKey(ascending=False)
+
+#Todas musicas que mais ficaram em primeiro lugar todas as músicas
+music_pos = archiveRDD.map(lambda x: (x[2].split(" (")[0], x[1]))
+music_1 = music_pos.filter(lambda x: x[1] == '1')
+music_1_name = music_1.map(lambda x: x[0])
+frequence_musics_1 = music_1_name.map(lambda x: (x,1)).reduceByKey(lambda x,y:x+y).map(lambda x: (x[1],x[0])).sortByKey(ascending=False)
+
+
+#Todas os artistas que mais ficaram em primeiro lugar
+artist_pos = archiveRDD.map(lambda x: (x[0].split(",")[0], x[1]))
+artist_1 = artist_pos.filter(lambda x: x[1] == '1')
+artist_1_name = artist_1.map(lambda x: x[0])
+frequence_artist_1 = artist_1_name.map(lambda x: (x,1)).reduceByKey(lambda x,y:x+y).map(lambda x: (x[1],x[0])).sortByKey(ascending=False)
+
+#Todas as palavras mais frequentes das musicas que ficaram em primeiro lugar
+#Todas as duplas de palavras presentes em todas as músicas
+
+#Plota todas as relações musica-artista e aparecem mais de uma vez, caso seja uma música frequente
+artist_music = archiveRDD.map(lambda x: (x[0].split(",")[0],x[2].split(" (")[0]))
+
